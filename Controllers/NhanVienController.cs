@@ -104,7 +104,7 @@ namespace QuanLyQuanCaPhe.Controllers
             return View(employee);
         }
 
-        // Cập nhật thông tin nhân viên
+        // Cập nhật thông tin của nhân viên
         [HttpPost]
         public async Task<IActionResult>EditEmployee(NhanVienModel model)
         {
@@ -116,5 +116,7 @@ namespace QuanLyQuanCaPhe.Controllers
             }
             return View(model);
         }
+
+        
     }
 }
