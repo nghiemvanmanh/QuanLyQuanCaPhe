@@ -1,0 +1,179 @@
+@model IEnumerable<QuanLyQuanCaPhe.Models.SanPhamModel>
+<h2>----Thêm Sản Phẩm-----</h2>
+<form>
+    <span class="d-flex flex-row justify-content-between">
+        <div class="col-4">
+            <label for="sTenSP">Tên sản phẩm</label>
+            <input id="sTenSP" class="form-control" />
+        </div>
+        <div class="col-3">
+            <label for="FK_sMaNCC">Nhà cung cấp</label>
+            <select id="FK_sMaNCC" class="form-control"
+                asp-items="@(new SelectList(ViewBag.NhaCungCap, "PK_sMaNCC", "sTenNCC"))">
+                <option value="">Chọn nhà cung cấp</option>
+            </select>
+        </div>
+        <div class="col-3">
+            <label for="FK_sMaLSP">Loại sản phẩm</label>
+            <select id="FK_sMaLSP" class="form-control" asp-items="ViewBag.LoaiSanPham">
+                <option value="">Chọn loại sản phẩm</option>
+            </select>
+        </div>
+    </span>
+    <div class="d-flex flex-row justify-content-between mt-3">
+        <div class="col-1">
+            <label for="iSoLuong">Số lượng</label>
+            <input id="iSoLuong" class="form-control" />
+        </div>
+        <div class="col-6">
+            <label for="fGiaSP">Giá sản phẩm</label>
+            <input id="fGiaSP" class="form-control" />
+        </div>
+        <div class="col-4" style="position: relative;">
+            <label for="sIMG">Hình ảnh</label>
+            <input type="file" id="sIMG" class="form-control" onchange="previewImage(event)" />
+            <div>
+                <img id="imagePreview" src="#" alt="Chọn ảnh"
+                    style="max-width: 150px; display: none; position: absolute; top:70px ;" />
+            </div>
+        </div>
+    </div>
+    <button onclick='createProduct(event)' class="btn btn-primary mt-2 mb-2">Thêm</button>
+</form>
+<h2>Danh sách sản phẩm</h2>
+<form method="get" asp-action="Index">
+    <div class="form-group col-6">
+        <label for="FK_sMaNCC">Nhà cung cấp</label>
+        <select id="FK_sMaNCC" name="maNCC" class="form-control"
+            asp-items="@(new SelectList(ViewBag.NhaCungCap, "PK_sMaNCC", "sTenNCC"))">
+            <option value="">Tất cả</option>
+        </select>
+        <button type="submit" class="btn btn-primary mt-2 mb-2">Lọc</button>
+    </div>
+</form>
+<div <div class="table-responsive" style="height: 500px; overflow-y: auto;">
+    <table class="table table-bordered" id="productTable">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Nhà cung cấp</th>
+                <th>Loại sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var sanPham in Model)
+                {
+                <tr id="@sanPham.PK_sMaSP">
+                    <td>@sanPham.PK_sMaSP</td>
+                    <td><img src="@Url.Content($"~/{@sanPham.sIMG}")" alt="Product Image" style="max-width: 100px;" /></td>
+                    <td>@sanPham.sTenSP</td>
+                    <td>
+                            @foreach (var ncc in ViewBag.NhaCungCap)
+                            {
+                                if (ncc.PK_sMaNCC == sanPham.FK_sMaNCC)
+                                {
+                                    @ncc.sTenNCC
+                                    ;
+                                    break;
+                                }
+                            }
+                    </td>
+                    <td>@sanPham.FK_sMaLSP</td>
+                    <td>@sanPham.iSoLuong</td>
+                    <td>@sanPham.fGiaSP</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id='@sanPham.PK_sMaSP' class="btn btn-primary">Sửa</a>
+                        <button type="button" class="btn btn-danger"
+                            onclick="deleteItem(event,'@sanPham.PK_sMaSP')">Xóa</button>
+                    </td>
+                </tr>
+                }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function createProduct(event) {
+        event.preventDefault();
+        const product = {
+            PK_sMaSP: '1',
+            sTenSP: document.getElementById('sTenSP').value,
+            FK_sMaNCC: document.getElementById('FK_sMaNCC').value,
+            FK_sMaLSP: document.getElementById('FK_sMaLSP').value,
+            iSoLuong: parseInt(document.getElementById('iSoLuong').value),
+            fGiaSP: parseFloat(document.getElementById('fGiaSP').value)
+        };
+        console.log('check product', product);
+        const formData = new FormData();
+        formData.append('product', JSON.stringify(product));
+        const imageFile = document.getElementById('sIMG').files[0];
+        if (imageFile) {
+            formData.append('imageFile', imageFile);
+        }
+        try {
+            const response = await fetch('/SanPham/Create', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                alert('Product created successfully');
+                window.location.href = '/SanPham/Index';
+            } else {
+                alert('Error creating product: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while creating the product.');
+        }
+    }
+    function previewImage(event) {
+        var imagePreview = document.getElementById('imagePreview');
+        var file = event.target.files[0]; // Lấy file từ input
+
+        if (file) {
+            var reader = new FileReader();
+
+            // Đọc file dưới dạng URL
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result; // Gán URL của ảnh vào thẻ <img>
+                imagePreview.style.display = 'block'; // Hiển thị ảnh
+            }
+
+            reader.readAsDataURL(file); // Đọc file để hiển thị ảnh
+        } else {
+            imagePreview.src = "#";
+            imagePreview.style.display = 'none'; // Ẩn nếu không có file
+        }
+    }
+    async function deleteItem(event, idDelete) {
+        event.preventDefault();
+        console.log("Check: ", idDelete)
+        try {
+            const response = await fetch(`/SanPham/Delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: idDelete })
+            });
+
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                document.getElementById(`${idDelete}`).remove();
+                alert(data.message)
+            } else {
+                alert('Error deleting product');
+            }
+        } catch (error) {
+            console.error('Error 123:', error);
+        }
+    }
+</script>

@@ -1,0 +1,62 @@
+﻿@model QuanLyQuanCaPhe.Models.NhanVienModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa nhân viên";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="EditEmployee" method="post" class="form-horizontal">
+    <div class="form-group">
+        <label class="control-label">Mã NV</label>
+        <input asp-for="PK_sMaNV" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Tên NV</label>
+        <input asp-for="sTenNV" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Ngày Sinh</label>
+        <input asp-for="dNgaySinh" type="date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Giới Tính</label>
+        <select asp-for="sGioiTinh" class="form-control">
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="control-label">CCCD</label>
+        <input asp-for="sCCCD" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Địa Chỉ</label>
+        <input asp-for="sDiaChi" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Số Điện Thoại</label>
+        <input asp-for="sSDT" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Email</label>
+        <input asp-for="sEmail" class="form-control" type="email" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Ngày Vào Làm</label>
+        <input asp-for="dNgayVaoLam" type="date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Lương Cơ Bản</label>
+        <input asp-for="fLuongcb" type="number" class="form-control" step="0.01" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Tình Trạng</label>
+        <input asp-for="sTinhTrang" class="form-control" />
+    </div>
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        <a asp-action="ListEmployee" class="btn btn-secondary">Hủy bỏ</a>
+    </div>
+</form>

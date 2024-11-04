@@ -1,0 +1,97 @@
+﻿@model QuanLyQuanCaPhe.Models.NhanVienModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thêm Nhân Viên</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center my-4">Thêm Nhân Viên</h2>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form asp-action="NewEmployee" method="post" class="border p-4 shadow rounded bg-light">
+                    <div class="mb-3">
+                        <label asp-for="PK_sMaNV" class="form-label">Mã Nhân Viên</label>
+                        <input asp-for="PK_sMaNV" class="form-control" required />
+                        <span asp-validation-for="PK_sMaNV" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sTenNV" class="form-label">Tên Nhân Viên</label>
+                        <input asp-for="sTenNV" class="form-control" required />
+                        <span asp-validation-for="sTenNV" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="dNgaySinh" class="form-label">Ngày Sinh</label>
+                        <input asp-for="dNgaySinh" class="form-control" type="date" required />
+                        <span asp-validation-for="dNgaySinh" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sGioiTinh" class="form-label">Giới Tính</label>
+                        <select asp-for="sGioiTinh" class="form-select" required>
+                            <option value="">Chọn giới tính</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                        <span asp-validation-for="sGioiTinh" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sCCCD" class="form-label">Số CCCD</label>
+                        <input asp-for="sCCCD" class="form-control" required />
+                        <span asp-validation-for="sCCCD" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sDiaChi" class="form-label">Địa Chỉ</label>
+                        <input asp-for="sDiaChi" class="form-control" required />
+                        <span asp-validation-for="sDiaChi" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sSDT" class="form-label">Số Điện Thoại</label>
+                        <input asp-for="sSDT" class="form-control" required />
+                        <span asp-validation-for="sSDT" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sEmail" class="form-label">Email</label>
+                        <input asp-for="sEmail" class="form-control" required />
+                        <span asp-validation-for="sEmail" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="dNgayVaoLam" class="form-label">Ngày Vào Làm</label>
+                        <input asp-for="dNgayVaoLam" class="form-control" type="date" required />
+                        <span asp-validation-for="dNgayVaoLam" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="fLuongcb" class="form-label">Lương Cơ Bản</label>
+                        <input asp-for="fLuongcb" class="form-control" type="number" step="0.01" required />
+                        <span asp-validation-for="fLuongcb" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="sTinhTrang" class="form-label">Tình Trạng</label>
+                        <input asp-for="sTinhTrang" class="form-control" required />
+                        <span asp-validation-for="sTinhTrang" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Lưu Nhân Viên</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="@Url.Action("ListEmployee", "NhanVien")">Quay lại danh sách nhân viên</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS Bundle -->
+</body>
+</html>

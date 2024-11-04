@@ -1,0 +1,58 @@
+﻿@model IEnumerable<QuanLyQuanCaPhe.Models.BaoCaoDoanhThuViewModel>
+@{
+    double tong = 0;
+}
+<h2>Báo Cáo Doanh Thu</h2>
+
+<form id="reportForm" method="post" asp-action="DoanhThu">
+    <div class="form-group col-3 mt-2">
+        <label for="startDate">Ngày Bắt Đầu</label>
+        <input type="date" id="startDate" name="startDate" class="form-control"
+            value="@DateTime.Today.AddDays(-DateTime.Today.Day + 1).ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="form-group col-3 mt-2">
+        <label for="endDate">Ngày Kết Thúc</label>
+        <input type="date" id="endDate" name="endDate" class="form-control"
+            value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Xem Báo Cáo</button>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <h3>Kết Quả Doanh Thu</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mã Sản Phẩm</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Tổng Doanh Thu</th>
+                <th>Số Lượng Bán</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MaSP</td>
+                    <td>@item.TenSP</td>
+                    <td>@item.TongDoanhThu.ToString("N0")</td>
+                    <td>@item.SoLuongBan</td>
+                    @{
+                        tong += item.TongDoanhThu;
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="mt-3">
+        <strong>Tổng doanh thu tất cả sản phẩm: @tong.ToString("N0")</strong>
+    </div>
+}
+else
+{
+    <p>Không có dữ liệu cho khoảng thời gian đã chọn.</p>
+}
+
+@section Scripts {
+}

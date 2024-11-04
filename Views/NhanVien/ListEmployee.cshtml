@@ -1,0 +1,68 @@
+﻿@model IEnumerable<QuanLyQuanCaPhe.Models.NhanVienModel>
+
+@{
+    ViewData["Title"] = "Danh sách nhân viên";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã NV</th>
+            <th>Tên NV</th>
+            <th>Ngày Sinh</th>
+            <th>Giới Tính</th>
+            <th>Địa Chỉ</th>
+            <th>Số Điện Thoại</th>
+            <th>Lương Cơ Bản</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            <tr id="row-@employee.PK_sMaNV">
+                <td>@employee.PK_sMaNV</td>
+                <td>@employee.sTenNV</td>
+                <td>@employee.dNgaySinh.ToString("dd/MM/yyyy")</td>
+                <td>@employee.sGioiTinh</td>
+                <td>@employee.sDiaChi</td>
+                <td>@employee.sSDT</td>
+                <td>@employee.fLuongcb</td>
+                <td>
+                    <a asp-action="EditEmployee" asp-route-id="@employee.PK_sMaNV" class="btn btn-primary btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="deleteEmployee('@employee.PK_sMaNV')">Xóa</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    async function deleteEmployee(employeeId) {
+        if (!confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) return;
+
+        try {
+            const response = await fetch(`/NhanVien/Delete?id=${employeeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Xóa dòng của nhân viên trong bảng nếu xóa thành công
+                document.getElementById(`row-${employeeId}`).remove();
+                alert("Xóa nhân viên thành công!");
+            } else {
+                alert("Xóa nhân viên thất bại!");
+            }
+        } catch (error) {
+            console.error('Lỗi khi xóa nhân viên:', error);
+            alert("Đã xảy ra lỗi khi xóa nhân viên!");
+        }
+    }
+</script>

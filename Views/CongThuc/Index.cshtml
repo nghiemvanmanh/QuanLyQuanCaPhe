@@ -1,0 +1,111 @@
+@model IEnumerable<QuanLyQuanCaPhe.Models.CongThucModel>
+
+<h2>Danh sách công thức</h2>
+<a asp-action="Create" class="btn btn-primary">Thêm</a>
+<form method="get" asp-action="Index">
+    <div class="form-group col-6">
+        <label for="FK_sMaSP">Sản phẩm</label>
+        <select id="FK_sMaSP" name="maSP" class="form-control"
+            asp-items="@(new SelectList(ViewBag.SanPham, "PK_sMaSP", "sTenSP"))">
+        </select>
+        <button type="submit" class="btn btn-primary mt-2 mb-2">Lọc</button>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Tên nguyên liệu</th>
+            <th>Khối lượng</th>
+            <th>Đơn vị</th>
+            <th>Nhà cung cấp</th>
+            <th>#</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ct in Model)
+        {
+            <tr id="@ct.PK_sMaCT">
+                <td>
+                    @foreach (var sp in ViewBag.SanPham)
+                    {
+                        if (sp.PK_sMaSP == ct.FK_sMaSP)
+                        {
+                            @sp.sTenSP
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            @nl.sTenNL
+                            ;
+                            break;
+                        }
+                    }
+                </td>
+                <td>@ct.fKhoiLuong</td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            @nl.sDonVi
+                            ;
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            foreach (var ncc in ViewBag.NhaCungCap)
+                            {
+                                if (nl.FK_sMaNCC == ncc.PK_sMaNCC)
+                                {
+                                    @ncc.sTenNCC
+                                    ; break;
+                                }
+                            }
+                        }
+                    }
+                </td>
+                <td>
+                    <button type="button" onclick="deleteCongThuc(event, '@ct.PK_sMaCT')"
+                        class="btn btn-danger">Xóa</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    async function deleteCongThuc(event, idDelete) {
+        event.preventDefault();
+        console.log("Check: ", idDelete)
+        try {
+            const response = await fetch(`/CongThuc/Delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: idDelete })
+            });
+
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                document.getElementById(`${idDelete}`).remove();
+                alert(data.message)
+            } else {
+                alert('Error deleting product');
+            }
+        } catch (error) {
+            console.error('Error 123:', error);
+        }
+    }
+</script>

@@ -1,0 +1,106 @@
+@model QuanLyQuanCaPhe.Models.SanPhamModel
+
+<h2>----Thêm Sản Phẩm-----</h2>
+
+<form>
+    <span class="d-flex flex-row justify-content-between">
+        <div class="col-4">
+            <label for="sTenSP">Tên sản phẩm</label>
+            <input id="sTenSP" class="form-control" />
+            <span asp-validation-for="sTenSP" class="text-danger"></span>
+        </div>
+        <div class="col-3">
+            <label for="FK_sMaNCC">Nhà cung cấp</label>
+            <select id="FK_sMaNCC" class="form-control" asp-items="ViewBag.NhaCungCap">
+                <option value="">Chọn nhà cung cấp</option>
+            </select>
+            <span asp-validation-for="FK_sMaNCC" class="text-danger"></span>
+        </div>
+        <div class="col-3">
+            <label for="FK_sMaLSP">Loại sản phẩm</label>
+            <select id="FK_sMaLSP" class="form-control" asp-items="ViewBag.LoaiSanPham">
+                <option value="">Chọn loại sản phẩm</option>
+            </select>
+            <span asp-validation-for="FK_sMaLSP" class="text-danger"></span>
+        </div>
+    </span>
+    <div class="d-flex flex-row justify-content-between mt-3">
+        <div class="col-1">
+            <label for="iSoLuong">Số lượng</label>
+            <input id="iSoLuong" class="form-control" />
+            <span asp-validation-for="iSoLuong" class="text-danger"></span>
+        </div>
+        <div class="col-6">
+            <label for="fGiaSP">Giá sản phẩm</label>
+            <input id="fGiaSP" class="form-control" />
+            <span asp-validation-for="fGiaSP" class="text-danger"></span>
+        </div>
+        <div class="col-4">
+            <label for="sIMG">Hình ảnh</label>
+            <input type="file" id="sIMG" class="form-control" onchange="previewImage(event)" />
+            <div>
+                <img id="imagePreview" src="#" alt="Chọn ảnh" style="max-width: 200px; display: none;" />
+            </div>
+            <span asp-validation-for="sIMG" class="text-danger"></span>
+        </div>
+    </div>
+    <button onclick='createProduct()' class="btn btn-primary mt-2 mb-2">Thêm</button>
+</form>
+<div>
+    <a asp-action="Index">Quay lại danh sách sản phẩm</a>
+</div>
+<script>
+    async function createProduct() {
+        const product = {
+            PK_sMaSP: '1',
+            sTenSP: document.getElementById('sTenSP').value,
+            FK_sMaNCC: document.getElementById('FK_sMaNCC').value,
+            FK_sMaLSP: document.getElementById('FK_sMaLSP').value,
+            iSoLuong: parseInt(document.getElementById('iSoLuong').value),
+            fGiaSP: parseFloat(document.getElementById('fGiaSP').value)
+        };
+        console.log('check product', product);
+        const formData = new FormData();
+        formData.append('product', JSON.stringify(product));
+        const imageFile = document.getElementById('sIMG').files[0];
+        if (imageFile) {
+            formData.append('imageFile', imageFile);
+        }
+        try {
+            const response = await fetch('/SanPham/Create', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Product created successfully');
+                window.location.href = '/SanPham/Index';
+            } else {
+                alert('Error creating product: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while creating the product.');
+        }
+    }
+    function previewImage(event) {
+        var imagePreview = document.getElementById('imagePreview');
+        var file = event.target.files[0]; // Lấy file từ input
+
+        if (file) {
+            var reader = new FileReader();
+
+            // Đọc file dưới dạng URL
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result; // Gán URL của ảnh vào thẻ <img>
+                imagePreview.style.display = 'block'; // Hiển thị ảnh
+            }
+
+            reader.readAsDataURL(file); // Đọc file để hiển thị ảnh
+        } else {
+            imagePreview.src = "#";
+            imagePreview.style.display = 'none'; // Ẩn nếu không có file
+        }
+    }
+</script>

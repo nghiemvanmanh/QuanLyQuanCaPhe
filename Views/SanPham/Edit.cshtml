@@ -1,0 +1,103 @@
+@model QuanLyQuanCaPhe.Models.SanPhamModel
+
+<h2>Chỉnh Sửa Sản Phẩm</h2>
+<form id="editProductForm" enctype="multipart/form-data">
+    <input type="hidden" id="PK_sMaSP" value="@Model.PK_sMaSP" />
+
+    <div class="form-group">
+        <label for="sTenSP">Tên sản phẩm</label>
+        <input type="text" id="sTenSP" class="form-control" value="@Model.sTenSP" />
+    </div>
+
+    <div class="form-group">
+        <label for="FK_sMaNCC">Nhà cung cấp</label>
+        <select id="FK_sMaNCC" class="form-control"
+            asp-items="@(new SelectList(ViewBag.NhaCungCap, "PK_sMaNCC", "sTenNCC"))">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="FK_sMaLSP">Loại sản phẩm</label>
+        <select id="FK_sMaLSP" class="form-control"
+            asp-items="@(new SelectList(ViewBag.LoaiSanPham, "PK_sMaLSP", "sTenLoaiSanPham"))">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="iSoLuong">Số lượng</label>
+        <input type="number" id="iSoLuong" class="form-control" value="@Model.iSoLuong" />
+    </div>
+
+    <div class="form-group">
+        <label for="sIMG">Hình ảnh</label>
+        <input type="file" name="imageFile" accept="image/*" onchange="previewImage(event)">
+        <div>
+            <img id="imagePreview" src="#" alt="Chọn ảnh" style="max-width: 200px; display: none;" />
+        </div>
+        <input type="text" id="sIMG" class="form-control" value="@Model.sIMG" hidden />
+    </div>
+    <div class="form-group">
+        <label for="fGiaSP">Giá sản phẩm</label>
+        <input type="number" id="fGiaSP" class="form-control" value="@Model.fGiaSP" />
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="editProduct()">Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
+
+<script>
+    async function editProduct() {
+        var formData = new FormData();
+        const product = {
+            PK_sMaSP: document.getElementById('PK_sMaSP').value,
+            sTenSP: document.getElementById('sTenSP').value,
+            FK_sMaNCC: document.getElementById('FK_sMaNCC').value,
+            FK_sMaLSP: document.getElementById('FK_sMaLSP').value,
+            iSoLuong: parseInt(document.getElementById('iSoLuong').value),
+            sIMG: document.getElementById('sIMG').value,
+            fGiaSP: parseFloat(document.getElementById('fGiaSP').value)
+        };
+        formData.append('product', JSON.stringify(product));
+        var imageFile = document.querySelector('input[type="file"]').files[0];
+        if (imageFile) {
+            formData.append('imageFile', imageFile); // Thêm file vào FormData
+        }
+        console.log('Form data: ', formData);
+        try {
+            const response = await fetch('/SanPham/Edit', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Product updated successfully');
+                window.location.href = '/SanPham/Index';
+            } else {
+                alert('Error updating product: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while updating the product.');
+        }
+    }
+    function previewImage(event) {
+        var imagePreview = document.getElementById('imagePreview');
+        var file = event.target.files[0]; // Lấy file từ input
+
+        if (file) {
+            var reader = new FileReader();
+
+            // Đọc file dưới dạng URL
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result; // Gán URL của ảnh vào thẻ <img>
+                imagePreview.style.display = 'block'; // Hiển thị ảnh
+            }
+
+            reader.readAsDataURL(file); // Đọc file để hiển thị ảnh
+        } else {
+            imagePreview.src = "#";
+            imagePreview.style.display = 'none'; // Ẩn nếu không có file
+        }
+    }
+</script>

@@ -1,0 +1,188 @@
+@model IEnumerable<QuanLyQuanCaPhe.Models.KhachHangModel>
+<h2>----Thêm khách hàng-----</h2>
+<form>
+    <span class="d-flex flex-row gap-3 ">
+        <div class="col-4">
+            <label for="sTenKH">Tên khách hàng</label>
+            <input id="sTenKH" class="form-control" />
+        </div>
+        <div class="col-3">
+            <label for="sSDT">Số điện thoại</label>
+            <input id="sSDT" class="form-control" />
+        </div>
+    </span>
+    <div class="d-flex flex-row ">
+        <div class="col-7">
+            <label for="sDiaChi">Địa chỉ</label>
+            <input id="sDiaChi" class="form-control" />
+        </div>
+    </div>
+    <button onclick='createItem(event)' class="btn btn-primary mt-2 mb-2">Thêm</button>
+</form>
+<h2>Danh sách khách hàng</h2>
+<div <div class="table-responsive" style="height: 500px; overflow-y: auto;">
+    <table class="table table-bordered" id="productTable">
+        <thead>
+            <tr>
+                <th>Mã khách hàng</th>
+                <th>Tên khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
+                <th>Điểm</th>
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var khachHang in Model)
+                {
+                <tr id="@khachHang.PK_sMaKH">
+                    <td>@khachHang.PK_sMaKH</td>
+                    <td>@khachHang.sTenKH</td>
+                    <td>@khachHang.sSDT</td>
+                    <td>@khachHang.sDiaChi</td>
+                    <td>@khachHang.iDiem</td>
+                    <td>
+                        <button onclick="openEditModal({
+                            PK_sMaKH: '@khachHang.PK_sMaKH',
+                            sTenKH: '@khachHang.sTenKH',
+                            sSDT: '@khachHang.sSDT',
+                            sDiaChi: '@khachHang.sDiaChi'
+                                })" class=" btn btn-primary">
+                            Sửa
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                            onclick="deleteItem(event,'@khachHang.PK_sMaKH')">Xóa</button>
+                    </td>
+                </tr>
+                }
+        </tbody>
+    </table>
+</div>
+<!-- Modal HTML -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCustomerModalLabel">Cập nhật thông tin khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editPK_sMaKH" />
+                <div class="mb-3">
+                    <label for="editTenKH" class="form-label">Tên khách hàng</label>
+                    <input type="text" id="editTenKH" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="editSDT" class="form-label">Số điện thoại</label>
+                    <input type="text" id="editSDT" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="editDiaChi" class="form-label">Địa chỉ</label>
+                    <input type="text" id="editDiaChi" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="updateCustomer()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function openEditModal(khachHang) {
+        // Populate modal fields with existing data
+        document.getElementById('editPK_sMaKH').value = khachHang.PK_sMaKH;
+        document.getElementById('editTenKH').value = khachHang.sTenKH;
+        document.getElementById('editSDT').value = khachHang.sSDT;
+        document.getElementById('editDiaChi').value = khachHang.sDiaChi;
+
+        // Show the modal
+        const editCustomerModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+        editCustomerModal.show();
+    }
+
+    async function updateCustomer() {
+        const khachHang = {
+            PK_sMaKH: document.getElementById('editPK_sMaKH').value,
+            sTenKH: document.getElementById('editTenKH').value,
+            sSDT: document.getElementById('editSDT').value,
+            sDiaChi: document.getElementById('editDiaChi').value
+        };
+        console.log('check:', khachHang);
+        const formData = new FormData();
+        formData.append('khachHang', JSON.stringify(khachHang));
+        try {
+            const response = await fetch('/KhachHang/Edit', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                alert('Updated successfully');
+                window.location.href = '/KhachHang/Index';
+            } else {
+                alert('Error updating: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while updating.');
+        }
+    }
+    async function createItem(event) {
+        event.preventDefault();
+        const khachHang = {
+            PK_sMaKH: '1',
+            sTenKH: document.getElementById('sTenKH').value,
+            sDiaChi: document.getElementById('sDiaChi').value,
+            sSDT: document.getElementById('sSDT').value,
+            iDiem: 0
+        };
+        console.log('check:', khachHang);
+        const formData = new FormData();
+        formData.append('khachHang', JSON.stringify(khachHang));
+        try {
+            const response = await fetch('/KhachHang/Create', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                alert('Created successfully');
+                window.location.href = '/KhachHang/Index';
+            } else {
+                alert('Error creating: ' + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while creating.');
+        }
+    }
+    async function deleteItem(event, idDelete) {
+        event.preventDefault();
+        console.log("Check: ", idDelete)
+        try {
+            const response = await fetch(`/KhachHang/Delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: idDelete })
+            });
+
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                document.getElementById(`${idDelete}`).remove();
+                alert(data.message)
+            } else {
+                alert('Error deleting');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>

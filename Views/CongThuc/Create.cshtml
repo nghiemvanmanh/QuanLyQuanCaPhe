@@ -1,0 +1,153 @@
+@model QuanLyQuanCaPhe.Models.CongThucModel
+<form method="get" asp-action="Create">
+    <div class="form-group col-6">
+        <label for="FK_sMaSP">Sản phẩm</label>
+        <select id="FK_sMaSP" name="maSP" class="form-control"
+            asp-items="@(new SelectList(ViewBag.SanPham, "PK_sMaSP", "sTenSP"))">
+        </select>
+        <button type="submit" class="btn btn-primary mt-2 mb-2">Chọn</button>
+    </div>
+</form>
+@if (!string.IsNullOrEmpty(ViewBag.maSP))
+{
+    <form asp-action="Create" method="post">
+        <div class="mt-3">
+            <div class="">
+                <h4>Thêm công thức cho sản phẩm
+                    @foreach (var sp in ViewBag.SanPham)
+                    {
+                        if (sp.PK_sMaSP == ViewBag.maSP)
+                        {
+                            @sp.sTenSP
+                            ;
+                            break;
+                        }
+                    }
+                </h4>
+                <div class="d-flex gap-2">
+                    <div class="col-2">
+                        <label asp-for="FK_sMaSP">Sản phẩm</label>
+                        <input Value="@ViewBag.maSP" asp-for="FK_sMaSP" class="form-control" />
+                        <span asp-validation-for="FK_sMaSP" class="text-danger"></span>
+                    </div>
+                    <div class="col-3">
+                        <label asp-for="FK_sMaNL">Nguyên liệu</label>
+                        <select asp-for="FK_sMaNL" class="form-control"
+                            asp-items="@(new SelectList(ViewBag.NguyenLieu,"PK_sMaNL", "sTenNL"))">
+                            <option value="">Chọn loại nguyên liệu</option>
+                        </select>
+                        <span asp-validation-for="FK_sMaNL" class="text-danger"></span>
+                    </div>
+                    <div class="col-1">
+                        <label asp-for="fKhoiLuong">Khối lượng</label>
+                        <input type="number" asp-for="fKhoiLuong" class="form-control" />
+                        <span asp-validation-for="fKhoiLuong" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 d-flex align-items-center">
+                    Thêm nguyên liệu
+                </button>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <div> Vui lòng chọn sản phẩm để thêm công thức</div>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Tên nguyên liệu</th>
+            <th>Khối lượng</th>
+            <th>Đơn vị</th>
+            <th>Nhà cung cấp</th>
+            <th>#</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ct in ViewBag.CongThuc)
+        {
+            <tr id='@ct.PK_sMaCT'>
+                <td>
+                    @foreach (var sp in ViewBag.SanPham)
+                    {
+                        if (sp.PK_sMaSP == ct.FK_sMaSP)
+                        {
+                            @sp.sTenSP
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            @nl.sTenNL
+                            break;
+                        }
+                    }
+                </td>
+                <td>@ct.fKhoiLuong</td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            @nl.sDonVi
+                            ;
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var nl in ViewBag.NguyenLieu)
+                    {
+                        if (nl.PK_sMaNL == ct.FK_sMaNL)
+                        {
+                            foreach (var ncc in ViewBag.NhaCungCap)
+                            {
+                                if (nl.FK_sMaNCC == ncc.PK_sMaNCC)
+                                {
+                                    @ncc.sTenNCC
+                                    ; break;
+                                }
+                            }
+                        }
+                    }
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="deleteCongThuc(event,'@ct.PK_sMaCT')">Xóa</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    async function deleteCongThuc(event, idDelete) {
+        event.preventDefault();
+        console.log("Check: ", idDelete)
+        try {
+            const response = await fetch(`/CongThuc/Delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: idDelete })
+            });
+
+            const data = await response.json();
+            console.log("Check data: ", data)
+            if (data.success) {
+                document.getElementById(`${idDelete}`).remove();
+                alert(data.message)
+            } else {
+                alert('Error deleting product');
+            }
+        } catch (error) {
+            console.error('Error 123:', error);
+        }
+    }
+</script>

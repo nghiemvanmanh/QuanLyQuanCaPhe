@@ -1,0 +1,37 @@
+@model IEnumerable<QuanLyQuanCaPhe.Models.HoaDonModel>
+
+<h2>Danh Sách Hóa Đơn</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã Hóa Đơn</th>
+            <th>Tên khách hàng</th>
+            <th>Ngày Xuất Hóa Đơn</th>
+            <th>Tổng Tiền</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var hoaDon in Model)
+        {
+            <tr>
+                <td>@hoaDon.PK_sMaHD</td>
+                <td>@foreach (var kh in ViewBag.KhachHang)
+                    {
+                        if (kh.PK_sMaKH == hoaDon.FK_sMaKH)
+                        {
+                            @kh.sTenKH
+                        }
+                    }
+
+                </td>
+                <td>@hoaDon.dNgayXuatHD.ToShortDateString()</td>
+                <td>@hoaDon.fTongTien.ToString("N0")</td>
+                <td>
+                    <a asp-action="Detail" asp-route-id="@hoaDon.PK_sMaHD" class="btn btn-secondary">Chi tiết</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

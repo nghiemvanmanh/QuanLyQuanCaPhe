@@ -1,0 +1,168 @@
+﻿@model QuanLyQuanCaPhe.Models.HoaDonModel
+@{
+    ViewData["Title"] = "Tạo hóa đơn mới";
+    var sanPhamList = ViewData["SanPhamList"] as List<QuanLyQuanCaPhe.Models.SanPhamModel>;
+}
+
+<h2>Tạo hóa đơn mới</h2>
+
+<form>
+    <div>
+        <label class="form-label fw-bold">Khách hàng</label>
+        <div>
+            <input type="checkbox" class="form-check-input" id="hasAccount" onchange="toggleCustomerInput()" checked />
+            <label class="form-check-label" for="hasAccount">Khách hàng đã có tài khoản</label>
+        </div>
+        <div id="existingCustomer" style="display: block;" class="mt-3">
+            <label class="form-label">Chọn khách hàng</label>
+            <select id="FK_sMaKH" asp-for="FK_sMaKH" class="form-select">
+                @foreach (var khachHang in ViewData["KhachHangList"] as List<QuanLyQuanCaPhe.Models.KhachHangModel>)
+                {
+                    <option value="@khachHang.PK_sMaKH">@khachHang.sTenKH</option>
+                }
+            </select>
+        </div>
+        <div id="newCustomer" style="display: none;" class="mt-3">
+            <label class="form-label fw-bold">Thông tin khách hàng mới</label>
+            <input id="sTenKH" type="text" name="khachhang.sTenKH" placeholder="Nhập tên khách hàng"
+                class="form-control  mb-2" />
+            <input id="sSDT" type="text" name="khachhang.sSDT" placeholder="Nhập số điện thoại"
+                class="form-control mb-2" />
+            <input id="sDiaChi" type="text" name="khachhang.sDiaChi" placeholder="Nhập địa chỉ" class="form-control" />
+        </div>
+    </div>
+    <h4 class="mt-4">Chi tiết sản phẩm</h4>
+    <table id="productTable" class="table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select name="chiTietHoaDons[0].FK_sMaSP" class="form-control" onchange="updateDonGia(this)">
+                        @foreach (var sanPham in sanPhamList)
+                        {
+                            <option value="@sanPham.PK_sMaSP" data-dongia="@sanPham.fGiaSP">@sanPham.sTenSP</option>
+                        }
+                    </select>
+                </td>
+                <td><input type="number" name="chiTietHoaDons[0].iSoLuong" class="form-control quantity" min="1"
+                        value="1" oninput="updateThanhTien(this)" /></td>
+                <td><input type="number" name="chiTietHoaDons[0].fDonGia" class="form-control price" readonly /></td>
+                <td><input type="number" name="chiTietHoaDons[0].fThanhTien" class="form-control total" readonly /></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Xóa</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button class="btn btn-primary" type="button" onclick="addRow()">Thêm sản phẩm</button>
+    <button class="btn btn-primary" onclick="createInvoice(event)">Tạo hóa đơn</button>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+        integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        let rowCount = 1;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('#productTable select').forEach(select => {
+                updateDonGia(select);
+            });
+        });
+
+        function addRow() {
+            let row = `<tr>
+            <td>
+            <select name="chiTietHoaDons[${rowCount}].FK_sMaSP" class="form-control" onchange="updateDonGia(this)">
+        @foreach (var sanPham in sanPhamList)
+        {
+                <option value="@sanPham.PK_sMaSP" data-dongia="@sanPham.fGiaSP">@sanPham.sTenSP</option>
+        }
+            </select>
+            </td>
+            <td><input type="number" name="chiTietHoaDons[${rowCount}].iSoLuong" min="1" value="1" class="form-control quantity" oninput="updateThanhTien(this)" /></td>
+                <td><input  type="number" name="chiTietHoaDons[${rowCount}].fDonGia" class="form-control price" readonly /></td>
+            <td><input type="number" name="chiTietHoaDons[${rowCount}].fThanhTien" class="form-control total" readonly /></td>
+            <td><button class="btn btn-danger" type="button" onclick="removeRow(this)">Xóa</button></td>
+            </tr>`;
+            $("#productTable tbody").append(row);
+            rowCount++;
+
+            updateDonGia($("#productTable tbody tr:last select")[0]);
+        }
+
+        function removeRow(button) {
+            $(button).closest("tr").remove();
+        }
+        function updateDonGia(selectElement) {
+
+            let donGia = $(selectElement).find(':selected').data('dongia');
+            $(selectElement).closest("tr").find('input[name*="fDonGia"]').val(donGia);
+            console.log(donGia)
+            updateThanhTien(selectElement);
+        }
+
+        function updateThanhTien(inputElement) {
+            let row = $(inputElement).closest("tr");
+            let soLuong = parseFloat(row.find('input[name*="iSoLuong"]').val()) || 0;
+            let donGia = parseFloat(row.find('input[name*="fDonGia"]').val()) || 0;
+            let thanhTien = soLuong * donGia;
+            row.find('input[name*="fThanhTien"]').val(thanhTien);
+        }
+
+        function toggleCustomerInput() {
+            $('#newCustomer input').val('');
+            var hasAccount = document.getElementById('hasAccount').checked;
+            document.getElementById('existingCustomer').style.display = hasAccount ? 'block' : 'none';
+            document.getElementById('newCustomer').style.display = hasAccount ? 'none' : 'block';
+        }
+        async function createInvoice(event) {
+            event.preventDefault();
+            const hasAccount = document.getElementById("hasAccount").checked;
+            console.log(hasAccount)
+            const formData = new FormData();
+            const customer = hasAccount ?
+                { PK_sMaKH: document.getElementById("FK_sMaKH").value } :
+                {
+                    PK_sMaKH: '',
+                    sTenKH: document.getElementById("sTenKH").value,
+                    sSDT: document.getElementById("sSDT").value,
+                    sDiaChi: document.getElementById("sDiaChi").value
+                };
+            const products = Array.from(document.querySelectorAll("#productTable tbody tr")).map(row => ({
+                FK_sMaSP: row.querySelector("select").value,
+                iSoLuong: row.querySelector(".quantity").value,
+                fDonGia: row.querySelector(".price").value,
+                fThanhTien: row.querySelector(".total").value
+            }));
+            formData.append('products', JSON.stringify(products));
+            formData.append('customer', JSON.stringify(customer));
+            console.log("Check form data: ", formData)
+            try {
+                const response = await fetch('/HoaDon/Create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("Hóa đơn được tạo thành công!");
+                    window.location.href = '/HoaDon/Index';
+                } else {
+                    alert("Có lỗi xảy ra: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Đã xảy ra lỗi khi tạo hóa đơn.");
+            }
+        }
+    </script>
+}
