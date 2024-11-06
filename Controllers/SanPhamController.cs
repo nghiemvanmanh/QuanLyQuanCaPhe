@@ -65,7 +65,11 @@ namespace QuanLyQuanCaPhe.Controllers
             await _context.SaveChangesAsync();
             return Json(new { success = true, product = product, message = "Create new success" });
         }
-
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
         // Phương thức POST để xử lý yêu cầu xóa sản phẩm
         [HttpPost]
         [IgnoreAntiforgeryToken]

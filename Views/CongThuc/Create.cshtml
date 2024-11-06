@@ -27,7 +27,8 @@
                 <div class="d-flex gap-2">
                     <div class="col-2">
                         <label asp-for="FK_sMaSP">Sản phẩm</label>
-                        <input Value="@ViewBag.maSP" asp-for="FK_sMaSP" class="form-control" />
+                        <input Value="@ViewBag.maSP" asp-for="FK_sMaSP" class="form-control" disabled />
+                        <input type="hidden" name="FK_sMaSP" value="@ViewBag.maSP" />
                         <span asp-validation-for="FK_sMaSP" class="text-danger"></span>
                     </div>
                     <div class="col-3">
@@ -40,7 +41,7 @@
                     </div>
                     <div class="col-1">
                         <label asp-for="fKhoiLuong">Khối lượng</label>
-                        <input type="number" asp-for="fKhoiLuong" class="form-control" />
+                        <input type="number" asp-for="fKhoiLuong" class="form-control" min="1" value="1" />
                         <span asp-validation-for="fKhoiLuong" class="text-danger"></span>
                     </div>
                 </div>

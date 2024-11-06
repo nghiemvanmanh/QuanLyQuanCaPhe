@@ -38,6 +38,11 @@ namespace QuanLyQuanCaPhe.Controllers
                     ModelState.AddModelError("sCCCD", "CCCD đã tồn tại!");
                     return View("NewEmployee", nhanvien);
                 }
+                if (nhanvien.sCCCD.Length > 12)
+                {
+                    ModelState.AddModelError("sCCCD", "CCCD không quá 12 chữ số");
+                    return View("NewEmployee", nhanvien);
+                }
 
                 // Kiểm tra định dạng số điện thoại (chỉ cho phép các chữ số và độ dài 10-11 ký tự)
                 if (!System.Text.RegularExpressions.Regex.IsMatch(nhanvien.sSDT, @"^0[0-9]{9}$"))

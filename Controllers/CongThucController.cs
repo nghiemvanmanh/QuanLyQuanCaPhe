@@ -53,6 +53,11 @@ namespace QuanLyQuanCaPhe.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CongThucModel model)
         {
+            if (model.FK_sMaNL == null)
+            {
+                ModelState.AddModelError("FK_sMaNL", "Chưa chọn nguyên liệu!");
+                return View(model);
+            }
             if (ModelState.IsValid)
             {
                 var CongThuc = new CongThucModel
