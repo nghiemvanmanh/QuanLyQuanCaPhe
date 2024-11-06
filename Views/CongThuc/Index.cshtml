@@ -85,6 +85,7 @@
 </table>
 <script>
     async function deleteCongThuc(event, idDelete) {
+        if (!confirm("Bạn có chắc chắn muốn xóa công thức này?")) return;
         event.preventDefault();
         console.log("Check: ", idDelete)
         try {

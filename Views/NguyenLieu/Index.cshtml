@@ -1,0 +1,45 @@
+﻿@model IEnumerable<QuanLyQuanCaPhe.Models.NguyenLieuModel>
+
+@{
+    ViewData["Title"] = "Danh sách Nguyên Liệu";
+}
+
+<h2>Danh sách Nguyên Liệu</h2>
+@if(TempData["NguyenLieu"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["NguyenLieu"]
+    </div>
+}
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">Thêm Nguyên Liệu</a>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã Nguyên Liệu</th>
+            <th>Tên Nguyên Liệu</th>
+            <th>Đơn Vị</th>
+            <th>Số Lượng Còn Lại</th>
+            <th>Mã Nhà Cung Cấp</th>
+            <th>Thao Tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.PK_sMaNL</td>
+                <td>@item.sTenNL</td>
+                <td>@item.sDonVi</td>
+                <td>@item.fConLai</td>
+                <td>@item.FK_sMaNCC</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PK_sMaNL" class="btn btn-primary">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.PK_sMaNL" class="btn btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
