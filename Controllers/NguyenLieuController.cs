@@ -123,5 +123,18 @@ namespace QuanLyQuanCaPhe.Controllers
             }
             return View(nguyenLieu);
         }
+
+        [HttpDelete]
+        public IActionResult Delete(string id)
+        {
+            var nl = _context.tbl_NguyenLieu.FirstOrDefault(u=> u.PK_sMaNL == id);
+            if (nl != null)
+            {
+                _context.tbl_NguyenLieu.Remove(nl);
+                _context.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
     }
 }

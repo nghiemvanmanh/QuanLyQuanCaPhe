@@ -28,7 +28,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr id="nl-row-@item.PK_sMaNL">
                 <td>@item.PK_sMaNL</td>
                 <td>@item.sTenNL</td>
                 <td>@item.sDonVi</td>
@@ -36,10 +36,41 @@
                 <td>@item.FK_sMaNCC</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.PK_sMaNL" class="btn btn-primary">Sửa</a>
-                    <a asp-action="Delete" asp-route-id="@item.PK_sMaNL" class="btn btn-danger">Xóa</a>
+                    <button class="btn btn-danger" onclick="Delete('@item.PK_sMaNL')">Xóa</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<script>
+    function Delete(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa nguyên liệu này không?")) {
+            fetch(`/NguyenLieu/Delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`nl-row-${id}`).remove()
+                    alert("Xóa phương tiện thành công!");
+                    location.reload();
+                } else {
+                    alert("Xóa nguyên liệu thất bại!");
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi:", error);
+                alert("Đã xảy ra lỗi khi xóa nguyên liệu!");
+            });
+        }
+    }
+</script>
